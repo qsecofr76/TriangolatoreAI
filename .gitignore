@@ -1,0 +1,21 @@
+# Ambienti virtuali
+venv/
+env/
+.venv/
+
+# Variabili d'ambiente (MOLTO IMPORTANTE PER NON ESPORRE LA API KEY)
+.env
+
+# Cache di Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Cartelle di output (ignora i file generati, ma mantiene la cartella)
+OutputAI/*
+!OutputAI/.gitkeep
+
+# File di sistema
+.DS_Store
+Thumbs.db

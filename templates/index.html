@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risultato Rendering AI</title>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .glass-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            max-width: 900px;
+            width: 100%;
+            animation: popIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        h1 {
+            font-weight: 300;
+            margin-top: 0;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .image-wrapper {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .image-wrapper:hover {
+            transform: translateY(-5px);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        .btn {
+            background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: opacity 0.3s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .disclaimer {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid #ff6b6b;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: #ffd6d6;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .logo {
+            max-height: 80px;
+            margin-bottom: 20px;
+            display: inline-block;
+            border-radius: 8px; /* in caso il logo abbia bisogno di angoli smussati */
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: rgba(255,255,255,0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-container">
+        <img src="{{ url_for('static', filename='LogoLaPrimavera.gif') }}" alt="La Primavera Logo" class="logo">
+        
+        <h1>Risultato Generazione AI</h1>
+        <div class="image-wrapper">
+            <img src="{{ image_url }}" alt="Immagine Generata">
+        </div>
+        <a href="/" class="btn">Nuovo Rendering</a>
+        
+        <div class="disclaimer">
+            <strong>⚠️ ATTENZIONE:</strong> L'immagine è prodotta tramite Intelligenza Artificiale ad uso puramente orientativo per la clientela. L'AI può indurre talvolta immagini falsate con dettagli non presenti nella realtà, inoltre le tonalità del colore e le venature possono risultare errate o approssimative rispetto al prodotto reale.
+        </div>
+        
+        <div class="footer">Generato dal Server Python (Flask) con Gemini</div>
+    </div>
+</body>
+</html>
