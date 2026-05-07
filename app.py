@@ -66,12 +66,27 @@ def add_watermark(base_img):
         else:
             text_w, text_h = draw.textsize(text, font=font)
             
-        text_x = base_w - text_w - padding
-        text_y = base_h - text_h - padding
+        # Creiamo un'immagine temporanea solo per il testo per poterla scalare
+        # Aggiungiamo +2 per dare spazio all'effetto ombra
+        text_img = Image.new('RGBA', (text_w + 2, text_h + 2), (0,0,0,0))
+        text_draw = ImageDraw.Draw(text_img)
         
-        # Effetto ombra (outline) leggero per rendere il testo leggibile su qualsiasi sfondo
-        draw.text((text_x+1, text_y+1), text, fill="black", font=font)
-        draw.text((text_x, text_y), text, fill="white", font=font)
+        # Effetto ombra e testo bianco
+        text_draw.text((1, 1), text, fill="black", font=font)
+        text_draw.text((0, 0), text, fill="white", font=font)
+        
+        # Ingrandiamo il testo (es. 1.8x leggermente più grande)
+        scale_factor = 1.8
+        new_text_w = int(text_img.width * scale_factor)
+        new_text_h = int(text_img.height * scale_factor)
+        text_img = text_img.resize((new_text_w, new_text_h), resampling_filter)
+        
+        # Calcoliamo la nuova posizione per il testo ingrandito
+        text_x = base_w - new_text_w - padding
+        text_y = base_h - new_text_h - padding
+        
+        # Incolliamo il testo scalato sul livello del watermark
+        watermark_layer.paste(text_img, (text_x, text_y), text_img)
         
         # Unione dei livelli
         base_img = base_img.convert("RGBA")
