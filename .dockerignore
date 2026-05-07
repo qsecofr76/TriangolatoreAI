@@ -1,0 +1,22 @@
+# Ambiente virtuale Python
+venv/
+env/
+.venv/
+
+# FILE ESTREMAMENTE SENSIBILE
+.env
+
+# Cache e file di output Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OutputAI: non copiare la cache delle immagini generate nel server pulito
+OutputAI/*
+!OutputAI/.gitkeep
+
+# File di Git e IDE
+.git
+.gitignore
+.vscode/
+.idea/
