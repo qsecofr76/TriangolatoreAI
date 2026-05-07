@@ -23,6 +23,64 @@ SCENARI_DIR = os.path.join(BASE_DIR, "Scenari")
 FINITURE_DIR = os.path.join(BASE_DIR, "Finiture")
 OUTPUT_DIR = os.path.join(BASE_DIR, "OutputAI")
 
+def add_watermark(base_img):
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        
+        logo_path = os.path.join(BASE_DIR, "static", "LogoLaPrimavera.gif")
+        if not os.path.exists(logo_path):
+            return base_img
+            
+        # Convertiamo la GIF in RGBA mantenendo la trasparenza (se presente)
+        logo = Image.open(logo_path).convert("RGBA")
+        
+        base_w, base_h = base_img.size
+        # Rimpiccioliamo il logo per essere circa il 15% della base (o max 150px)
+        target_logo_w = min(150, int(base_w * 0.15))
+        w_percent = (target_logo_w / float(logo.size[0]))
+        target_logo_h = int((float(logo.size[1]) * float(w_percent)))
+        
+        # In Pillow >= 10 esiste Image.Resampling.LANCZOS, altrimenti usiamo la fallback
+        resampling_filter = getattr(Image, 'Resampling', Image).LANCZOS
+        logo = logo.resize((target_logo_w, target_logo_h), resampling_filter)
+        
+        watermark_layer = Image.new('RGBA', base_img.size, (0,0,0,0))
+        
+        padding = 20
+        # Posizione logo in basso a dx (lasciando 20px extra per il testo)
+        pos_x = base_w - target_logo_w - padding
+        pos_y = base_h - target_logo_h - padding - 20
+        
+        # Paste del logo usando lui stesso come maschera per la trasparenza
+        watermark_layer.paste(logo, (pos_x, pos_y), logo)
+        
+        draw = ImageDraw.Draw(watermark_layer)
+        text = "AI generated image"
+        font = ImageFont.load_default()
+        
+        # Ottenere le dimensioni del font (compatibilità vecchie e nuove versioni PIL)
+        if hasattr(draw, "textbbox"):
+            bbox = draw.textbbox((0, 0), text, font=font)
+            text_w = bbox[2] - bbox[0]
+            text_h = bbox[3] - bbox[1]
+        else:
+            text_w, text_h = draw.textsize(text, font=font)
+            
+        text_x = base_w - text_w - padding
+        text_y = base_h - text_h - padding
+        
+        # Effetto ombra (outline) leggero per rendere il testo leggibile su qualsiasi sfondo
+        draw.text((text_x+1, text_y+1), text, fill="black", font=font)
+        draw.text((text_x, text_y), text, fill="white", font=font)
+        
+        # Unione dei livelli
+        base_img = base_img.convert("RGBA")
+        final_img = Image.alpha_composite(base_img, watermark_layer)
+        return final_img.convert("RGB")
+    except Exception as e:
+        print(f"Errore watermark: {e}")
+        return base_img
+
 @app.route("/")
 def index():
     return "Il Server è in esecuzione! Utilizza il link nel formato: /render?scenario=NomeScenario&finitura=NomeFinitura"
@@ -93,12 +151,14 @@ def api_generate():
                     import io
                     image_bytes = part.inline_data.data
                     generated_img = PIL.Image.open(io.BytesIO(image_bytes))
+                    generated_img = add_watermark(generated_img)
                     generated_img.save(output_path)
                     saved_image = True
                     print(f"Immagine generata e salvata con successo da {MODEL_NAME}!")
                     break
 
         if not saved_image:
+            scenario_img = add_watermark(scenario_img)
             scenario_img.save(output_path)
 
         return jsonify({"success": True, "filename": output_filename})
